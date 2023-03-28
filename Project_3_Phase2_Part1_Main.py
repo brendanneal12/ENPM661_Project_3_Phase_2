@@ -62,7 +62,7 @@ class Node():
         return CompletedMoves, NodePath
     
 ##----------------------Defining Obstacle Space Setup Functions--------------------##
-def setup(robotradius):
+def setup(robotradius, ObsClearance):
 
     global arena
 
@@ -76,7 +76,7 @@ def setup(robotradius):
 
         for y in range(0, 250):
         
-            if checkClearance(x, y, robotradius):
+            if checkClearance(x, y, robotradius, ObsClearance):
                 arena[y, x] = darkGray
     
     #Draw Obstacle Borders
@@ -84,7 +84,7 @@ def setup(robotradius):
 
         for y in range(0, 250):
         
-            if checkBorder(x, y):
+            if checkBorder(x, y, ObsClearance):
                 arena[y, x] = gray
     
     #Draw Obstacles
@@ -125,39 +125,39 @@ def checkObstacle(x, y):
     return False
   
 ##-----------------------------Border Check Function---------------------##
-def checkBorder(x, y):
+def checkBorder(x, y, ObsClearance):
     
     triHeight = int(round(5/math.cos(math.radians(63.4))))
     hexHeight = int(round(5/math.cos(math.radians(30.3))))
     
     #Both Rectangles
-    if x >= 100 - 5 and x <= 150 + 5:
+    if x >= 100 - ObsClearance and x <= 150 + ObsClearance:
         
-        if y < 100 + 5 or y >= 150 - 5:
+        if y < 100 + ObsClearance or y >= 150 - ObsClearance:
             return True
     
     #Pentagon (Left Half)
-    if x >= 235 - 5 and x <= 300:
+    if x >= 235 - ObsClearance and x <= 300:
         
         if (y >= (-38/65)*x + (2930/13) - hexHeight) and (y <= (38/65)*x + (320/13) + hexHeight):
             return True
     
     #Pentagon (Right Half)
-    if x >= 300 and x <= 366 + 5:
+    if x >= 300 and x <= 366 + ObsClearance:
         
         if (y >= (38/65)*x + (-1630/13) - hexHeight) and (y <= (-38/65)*x + (4880/13) + hexHeight):
             return True
     
     #Triangle
-    if x >= 460 - 5 and x <= 510 + 5:
+    if x >= 460 - ObsClearance and x <= 510 + ObsClearance:
         
-        if (y >= 2*x - 895 - triHeight) and (y <= -2*x + 1145 + triHeight) and (y >= 25 - 5) and (y <= 225 + 5):
+        if (y >= 2*x - 895 - triHeight) and (y <= -2*x + 1145 + triHeight) and (y >= 25 - ObsClearance) and (y <= 225 + ObsClearance):
             return True
         
     return False
 
 ##-------------------------------Defining Radial Clearance Function--------------##
-def checkClearance(x, y, r):
+def checkClearance(x, y, r, ObsClearance):
     
     rr = r+1
     
@@ -168,13 +168,13 @@ def checkClearance(x, y, r):
     hexHeight = int(round((5 + rr)/math.cos(math.radians(30.3))))
     
     #Both Rectangles
-    if x >= 100 - 5 - rr and x <= 150 + 5 + rr:
+    if x >= 100 - ObsClearance - rr and x <= 150 + ObsClearance + rr:
         
-        if y < 100 + 5 + rr or y >= 150 - 5 - rr:
+        if y < 100 + ObsClearance + rr or y >= 150 - ObsClearance - rr:
             return True
     
     #Pentagon (Left Half)
-    if x >= 235 - 5 - rr and x <= 300:
+    if x >= 235 - ObsClearance - rr and x <= 300:
         
         if (y >= (-38/65)*x + (2930/13) - hexHeight) and (y <= (38/65)*x + (320/13) + hexHeight):
             return True
@@ -186,30 +186,43 @@ def checkClearance(x, y, r):
             return True
     
     #Triangle
-    if x >= 460 - 5 - rr and x <= 510 + 5 + rr:
+    if x >= 460 - ObsClearance - rr and x <= 510 + ObsClearance + rr:
         
-        if (y >= 2*x - 895 - triHeight) and (y <= -2*x + 1145 + triHeight) and (y >= 25 - 5 - rr) and (y <= 225 + 5 + rr):
+        if (y >= 2*x - 895 - triHeight) and (y <= -2*x + 1145 + triHeight) and (y >= 25 - ObsClearance - rr) and (y <= 225 + ObsClearance + rr):
             return True
         
     return False
 
 ##---------------------------------------Defining Check Valid Move Function-----------------------##
 #Checks to see if a point is valid (by checking obstacle, border, and clearance, as well as making sure the point is within arena bounds)
-def checkValid(x, y, r):
+def checkValid(x, y, r, ObsClearance):
     
     if checkObstacle(x, y):
         return False
     
-    if checkBorder(x, y):
+    if checkBorder(x, y, ObsClearance):
         return False
     
-    if checkClearance(x, y, r):
+    if checkClearance(x, y, r, ObsClearance):
         return False
     
     if (x < 0 or x >= 600 or y < 0 or y >= 250):
         return False
     
     return True
+
+##--------------------------Defining my Plotting Function--------------------------##
+
+
+    
+
+'''For Integers'''
+def WSColoring(Workspace, Location, Color):
+    x,_,_ = Workspace.shape #Get Shape of Workspace
+    translation_x = Location[0] #Where in X
+    translation_y = Location[1] #Where in Y
+    Workspace[translation_x,translation_y,:] = Color #Change the Color to a set Color
+    return Workspace  
 
 
 
@@ -235,3 +248,47 @@ def GetWheelRPM():
     print("Enter Wheel RPMS (Left First then Right).")
     WheelRPMS = [int(x) for x in input().split()]
     return  WheelRPMS
+
+
+
+##----------------------------------"Main" Script-------------------------------------##
+
+##-------Getting Parameters from Burger TurtleBot Dimensions-------##
+
+WheelRadius = 33 #mm
+RobotRadius = 89 #mm
+WheelDistance = 160 #mm
+
+##----------------------Arena Setup-------------------##
+arena = np.zeros((250, 600, 3), dtype = "uint8")
+InitState = GetInitialState()
+GoalState =GetGoalState()
+DesClearance = GetClearance()
+WheelRPMS = GetWheelRPM()
+
+# if not checkValid(InitState[0], InitState[1], RobotRadius, DesClearance):
+#     print("Your initial state is inside an obstacle or outside the workspace. Please retry.")
+#     exit()
+# if not checkValid(GoalState[0], GoalState[1], RobotRadius, DesClearance):
+#     print("Your goal state is inside an obstacle or outside the workspace. Please retry.")
+#     exit()
+
+setup(RobotRadius, DesClearance)
+
+WSColoring(arena, InitState, (0,255,0))
+WSColoring(arena, GoalState, (0,255,0))
+
+plt.imshow(arena, origin='lower')
+plt.show()
+
+#Initialize Arena and Thresholds
+SizeArenaX = 600
+SizeArenaY = 250
+ThreshXY = 0.5
+ThreshTheta = 30
+ThreshGoalState = 1.5
+
+# Initialize Node Array
+node_array = np.array([[[ 0 for k in range(int(360/ThreshTheta))] 
+                        for j in range(int(SizeArenaX/ThreshXY))] 
+                        for i in range(int(SizeArenaY/ThreshXY))])
