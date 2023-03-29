@@ -214,7 +214,54 @@ def checkValid(x, y, r, ObsClearance):
 
 ##---------------------------------Defining my Action Set-----------------------------------------##
 
+def ReturnPossibleStates(CurrentNodeState, Wheel_RPMS, RobotRadius, ObsClearance, WheelRad, WheelDist):
+    RPM1 = Wheel_RPMS[0]
+    RPM2 = Wheel_RPMS[1]
+    ActionSet = [[RPM1, RPM1], [RPM2,RPM2],[RPM1, RPM2], [RPM2, RPM1], [0,RPM1], [RPM1,0], [0,RPM2], [RPM2,0]]
+    NewNodeStates = []
+
+    for action in ActionSet:
+        NewNodeState, Cost = CalcMoveWithCost(CurrentNodeState, action, RobotRadius, ObsClearance, WheelRad, WheelDist)
+        if NewNodeState is not None:
+            NewNodeStates.append(NewNodeState)
+
+    return NewNodeStates
+
 ##---------------------------------Defining my Cost Function--------------------------------------##
+
+def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, WheelRad, WheelDist):
+    t = 0
+    dt = 0.1
+    Curr_Node_X = CurrentNodeState[0]
+    Curr_Node_Y = CurrentNodeState[1]
+    Curr_Node_Theta = np.deg2rad(CurrentNodeState[2])
+    Cost = 0
+    New_Node_X = Curr_Node_X
+    New_Node_Y = Curr_Node_Y
+    New_Node_Theta = Curr_Node_Theta
+    while t < 1:
+        t += dt
+        ChangeX = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.cos(Curr_Node_Theta)*dt
+        ChangeY = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.sin(Curr_Node_Theta)*dt
+        ChangeTheta = (WheelRad/WheelDist)*(WheelAction[0]-WheelAction[1])*dt
+        New_Node_X += ChangeX
+        New_Node_Y += ChangeY
+        New_Node_Theta += ChangeTheta
+
+        Cost += np.sqrt((ChangeX)**2 + (ChangeY)**2)
+
+        if checkValid(New_Node_X, New_Node_Y, RobotRadius, ObsClearance) == False:
+            return None, None
+        
+        New_Node_Theta = np.rad2deg(New_Node_Theta)
+
+        if New_Node_Theta >= 360:
+            New_Node_Theta = New_Node_Theta - 360
+        if New_Node_Theta < 0:
+            New_Node_Theta = New_Node_Theta + 360
+
+        return [New_Node_X, New_Node_Y, New_Node_Theta], Cost
+
 
 
 ##--------------------------Defining my Plotting Functions--------------------------##
@@ -247,7 +294,7 @@ def GetClearance():
 
 ##--------------------------Defining my GetWheelRPMS Function------------------------##
 def GetWheelRPM():
-    print("Enter Wheel RPMS (Left First then Right).")
+    print("Enter Wheel RPMS, 2 Unique, Separated By Spaces")
     WheelRPMS = [int(x) for x in input().split()]
     return  WheelRPMS
 
