@@ -315,7 +315,7 @@ def WSColoring(Workspace, Location, Color):
     return Workspace  
 
 '''For Curves'''
-def PlotCurves(CurrentNodeState, WheelAction, WheelRad, WheelDist):
+def PlotCurves(CurrentNodeState, WheelAction, WheelRad, WheelDist, Color):
     t = 0
     dt = 0.1
     Curr_Node_X = CurrentNodeState[0]
@@ -332,7 +332,7 @@ def PlotCurves(CurrentNodeState, WheelAction, WheelRad, WheelDist):
         New_Node_X += ChangeX
         New_Node_Y += ChangeY
         New_Node_Theta += ChangeTheta
-        plt.plot([Curr_Node_X, New_Node_X], [Curr_Node_Y, New_Node_Y], color = 'green')
+        plt.plot([Curr_Node_X, New_Node_X], [Curr_Node_Y, New_Node_Y], color = Color)
 
 
 
@@ -417,7 +417,7 @@ print("A* Search Starting!!!!")
 while not (Open_List.empty()):
     current_node = Open_List.get()[1] #Grab first (lowest cost) item from Priority Queue.
     if current_node.ReturnMove() is not None:
-        PlotCurves(current_node.ReturnState(), current_node.ReturnMove(), WheelRadius, WheelDistance)
+        PlotCurves(current_node.ReturnState(), current_node.ReturnMove(), WheelRadius, WheelDistance, 'g')
 
     traversed_nodes.append(current_node) #Append the explored node (for visualization later)
     print(current_node.ReturnState(), current_node.ReturnTotalCost()) #Print to show search is working.
@@ -429,7 +429,7 @@ while not (Open_List.empty()):
         print("Total Cost:", current_node.ReturnTotalCost()) #Print Total Cost
         MovesPath, Path = current_node.ReturnPath() #BackTrack to find path.
         for nodes in Path: #For Each node in ideal path
-            PlotCurves(nodes.ReturnState(), nodes.ReturnMove(), WheelRadius, WheelDistance)
+            PlotCurves(nodes.ReturnState(), nodes.ReturnMove(), WheelRadius, WheelDistance, 'm')
 
 
     else: #If you have NOT reached the goal node
@@ -462,4 +462,25 @@ print("That took", stoptime - starttime, "seconds to complete")
 #Show the Completed Searched Arena
 plt.imshow(arena, origin='lower')
 plt.show()
+
+##--------------------Visualization--------------------##
+print("Visualization Starting!")
+plt.plot(InitState[0], InitState[1], 'go', markersize = 0.5) #plot init state
+plt.imshow(arena, origin = 'lower')
+
+for node in traversed_nodes: #Plots the search area
+    curr_node_state = node.ReturnState()
+    parent_node_state = node.ReturnParentState()
+    PlotCurves(node.ReturnState(), node.ReturnMove(), WheelRadius, WheelDistance, 'g')
+    plt.pause(0.000001)
+    
+
+for node in Path: #Plots the ideal path
+    curr_node_state = node.ReturnState()
+    parent_node_state = node.ReturnParentState()
+    PlotCurves(node.ReturnState(), node.ReturnMove(), WheelRadius, WheelDistance, 'm')
+    plt.pause(0.0001)
+
+plt.show()
+plt.close()
 
