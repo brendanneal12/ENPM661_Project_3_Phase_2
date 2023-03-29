@@ -223,8 +223,7 @@ def ReturnPossibleStates(CurrentNodeState, Wheel_RPMS, RobotRadius, ObsClearance
     for action in ActionSet:
         NewNodeState, Cost = CalcMoveWithCost(CurrentNodeState, action, RobotRadius, ObsClearance, WheelRad, WheelDist)
         if NewNodeState is not None:
-            NewNodeStates.append(NewNodeState)
-
+            NewNodeStates.append([NewNodeState, Cost, action])
     return NewNodeStates
 
 ##---------------------------------Defining my Cost Function--------------------------------------##
@@ -235,7 +234,7 @@ def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, W
     Curr_Node_X = CurrentNodeState[0]
     Curr_Node_Y = CurrentNodeState[1]
     Curr_Node_Theta = np.deg2rad(CurrentNodeState[2])
-    Cost = 0
+    MoveCost = 0
     New_Node_X = Curr_Node_X
     New_Node_Y = Curr_Node_Y
     New_Node_Theta = Curr_Node_Theta
@@ -248,19 +247,61 @@ def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, W
         New_Node_Y += ChangeY
         New_Node_Theta += ChangeTheta
 
-        Cost += np.sqrt((ChangeX)**2 + (ChangeY)**2)
+        MoveCost += np.sqrt((ChangeX)**2 + (ChangeY)**2)
 
         if checkValid(New_Node_X, New_Node_Y, RobotRadius, ObsClearance) == False:
             return None, None
         
-        New_Node_Theta = np.rad2deg(New_Node_Theta)
+        New_Node_Theta = int(np.rad2deg(New_Node_Theta))
 
         if New_Node_Theta >= 360:
             New_Node_Theta = New_Node_Theta - 360
         if New_Node_Theta < 0:
             New_Node_Theta = New_Node_Theta + 360
 
-        return [New_Node_X, New_Node_Y, New_Node_Theta], Cost
+        return [New_Node_X, New_Node_Y, New_Node_Theta], MoveCost
+    
+##---------------------------Defining my Cost to Go Calculation---------------------------##
+def Calculate_C2G(CurrentNodeState, GoalNodeState):
+    C2G = 0.0
+    X_Current = CurrentNodeState[0]
+    Y_Current = CurrentNodeState[1]
+    X_Goal = GoalNodeState[0]
+    Y_Goal = GoalNodeState[1]
+    if CurrentNodeState is not None:
+        C2G = np.sqrt((X_Goal-X_Current)**2 + (Y_Goal- Y_Current)**2) #Euclidian Distance Heuristic function
+    return C2G
+
+##-----------------------Defining my Compare to Goal Function---------------------------##
+
+def CompareToGoal(Current_Node_Position, Goal_Node_Position, ErrorThreshold):
+    Dist2Goal = (Goal_Node_Position[0] - Current_Node_Position[0])**2 + (Goal_Node_Position[1] - Current_Node_Position[1])**2 #Euclidian Distance
+    if Dist2Goal < ErrorThreshold**2: #Error less than threshold PLUS the angle has to be equal
+        return True
+    else:
+        return False
+    
+##-------------------------Defining my Round to Half Function-------------------------##
+''' This function is Required for "Check Visited" Capabilities'''
+def Round2Half(number):
+    testvalue = np.round(2*number)/2
+    if (testvalue == 10):
+        testvalue = testvalue - 0.5
+    return testvalue
+
+##---------------------------Defining my Check Visited Function-----------------------##
+def CheckIfVisited(Current_Node_State, Node_Array, XYThreshold, ThetaThreshold):
+    X = Current_Node_State[0]
+    Y = Current_Node_State[1]
+    Theta = Current_Node_State[2]
+    X = int(Round2Half(X)/XYThreshold)
+    Y = int(Round2Half(Y)/XYThreshold)
+    Theta = int(Round2Half(Theta)/ThetaThreshold)
+    if Node_Array[Y,X,Theta] == 1:
+        result = True
+    else:
+        result = False
+    return result
 
 
 
@@ -272,6 +313,28 @@ def WSColoring(Workspace, Location, Color):
     translation_y = Location[1] #Where in Y
     Workspace[translation_x,translation_y,:] = Color #Change the Color to a set Color
     return Workspace  
+
+'''For Curves'''
+def PlotCurves(CurrentNodeState, WheelAction, WheelRad, WheelDist):
+    t = 0
+    dt = 0.1
+    Curr_Node_X = CurrentNodeState[0]
+    Curr_Node_Y = CurrentNodeState[1]
+    Curr_Node_Theta = np.deg2rad(CurrentNodeState[2])
+    New_Node_X = Curr_Node_X
+    New_Node_Y = Curr_Node_Y
+    New_Node_Theta = Curr_Node_Theta
+    while t < 1:
+        t += dt
+        ChangeX = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.cos(Curr_Node_Theta)*dt
+        ChangeY = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.sin(Curr_Node_Theta)*dt
+        ChangeTheta = (WheelRad/WheelDist)*(WheelAction[0]-WheelAction[1])*dt
+        New_Node_X += ChangeX
+        New_Node_Y += ChangeY
+        New_Node_Theta += ChangeTheta
+        plt.plot([Curr_Node_X, New_Node_X], [Curr_Node_Y, New_Node_Y], color = 'green')
+
+
 
 
 
@@ -322,7 +385,7 @@ WheelRPMS = GetWheelRPM()
 #     print("Your goal state is inside an obstacle or outside the workspace. Please retry.")
 #     exit()
 
-setup(RobotRadius, DesClearance)
+#setup(RobotRadius, DesClearance)
 
 WSColoring(arena, InitState, (0,255,0))
 WSColoring(arena, GoalState, (0,255,0))
@@ -341,3 +404,62 @@ ThreshGoalState = 1.5
 node_array = np.array([[[ 0 for k in range(int(360/ThreshTheta))] 
                         for j in range(int(SizeArenaX/ThreshXY))] 
                         for i in range(int(SizeArenaY/ThreshXY))])
+
+Open_List = PriorityQueue() #Initialize list using priority queue.
+traversed_nodes = [] #Traversed nodes is for visualization later.
+starting_node = Node(InitState, None, None, 0, Calculate_C2G(InitState, GoalState)) #Generate starting node based on the initial state given above.
+Open_List.put((starting_node.ReturnTotalCost(), starting_node)) #Add to Open List
+GoalReach = False #Initialze Goal Check Variable
+Closed_List= np.array([])#Initialize Closed List of nodes. Closed list is based on node states
+starttime = timeit.default_timer() #Start the Timer when serch starts
+print("A* Search Starting!!!!")
+
+while not (Open_List.empty()):
+    current_node = Open_List.get()[1] #Grab first (lowest cost) item from Priority Queue.
+    if current_node.ReturnMove() is not None:
+        PlotCurves(current_node.ReturnState(), current_node.ReturnMove(), WheelRadius, WheelDistance)
+
+    traversed_nodes.append(current_node) #Append the explored node (for visualization later)
+    print(current_node.ReturnState(), current_node.ReturnTotalCost()) #Print to show search is working.
+    np.append(Closed_List, current_node.ReturnState()) #Append to Closed List
+    goalreachcheck = CompareToGoal(current_node.ReturnState(), GoalState, ThreshGoalState) #Check if we have reached goal.
+
+    if goalreachcheck: #If we have reached goal node.
+        print("Goal Reached!")
+        print("Total Cost:", current_node.ReturnTotalCost()) #Print Total Cost
+        MovesPath, Path = current_node.ReturnPath() #BackTrack to find path.
+        for nodes in Path: #For Each node in ideal path
+            PlotCurves(nodes.ReturnState(), nodes.ReturnMove(), WheelRadius, WheelDistance)
+
+
+    else: #If you have NOT reached the goal node
+        NewNodeStates_and_Cost = ReturnPossibleStates(current_node.ReturnState(), WheelRPMS, RobotRadius, DesClearance, WheelRadius, WheelDistance)#Generate New Nodes from the possible moves current node can take.
+        ParentC2C = current_node.ReturnC2C() #Get Parent C2C
+        if NewNodeStates_and_Cost not in Closed_List: #Check to see if the new node position is currently in the closed list
+            for State in NewNodeStates_and_Cost: #For each new node generated by the possible moves.
+                ChildNode_C2C = ParentC2C + State[1] #Get C2C for the child node
+                ChildNode_Total_Cost = ChildNode_C2C + Calculate_C2G(State[0], GoalState) #Get Total Cost for Child Node
+
+                NewChild = Node(State[0], current_node, State[2] ,ChildNode_C2C, ChildNode_Total_Cost) #Generate New Child Node Class
+                if CheckIfVisited(NewChild.ReturnState(), node_array, ThreshXY, ThreshTheta) ==  False: #If the node has not been visited before
+                    #Mark in Node Array
+                    node_array[int(Round2Half(NewChild.ReturnState()[1])/ThreshXY), int(Round2Half(NewChild.ReturnState()[0])/ThreshXY), int(Round2Half(NewChild.ReturnState()[2])/ThreshTheta)] = 1
+                    Open_List.put((NewChild.ReturnTotalCost() , NewChild)) #Put it into the Open list
+
+                if CheckIfVisited(NewChild.ReturnState(), node_array, ThreshXY, ThreshTheta) ==  True: #If you have visited before:
+                        if NewChild.ReturnTotalCost() > current_node.ReturnC2C() + State[1]: #If the current total cost is greater than the move
+                            NewChild.parent = current_node #Update Parent
+                            NewChild.C2C = current_node.ReturnC2C() + State[1] #Update C2C
+                            NewChild.TotalCost = NewChild.ReturnC2C() + Calculate_C2G(NewChild.ReturnState(), GoalState) #Update Total Cost
+
+    if goalreachcheck: #If you reach goal
+        break #Break the Loop
+
+stoptime = timeit.default_timer() #Stop the Timer, as Searching is complete.
+print("That took", stoptime - starttime, "seconds to complete")
+
+
+#Show the Completed Searched Arena
+plt.imshow(arena, origin='lower')
+plt.show()
+
