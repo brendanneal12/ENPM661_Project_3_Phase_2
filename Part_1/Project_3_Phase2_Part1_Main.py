@@ -309,8 +309,8 @@ def CheckIfVisited(Current_Node_State, Node_Array, XYThreshold, ThetaThreshold):
 '''For Integers'''
 def WSColoring(Workspace, Location, Color):
     x,_,_ = Workspace.shape #Get Shape of Workspace
-    translation_x = Location[0] #Where in X
-    translation_y = Location[1] #Where in Y
+    translation_x = Location[1] #Where in X
+    translation_y = Location[0] #Where in Y
     Workspace[translation_x,translation_y,:] = Color #Change the Color to a set Color
     return Workspace  
 
@@ -430,6 +430,8 @@ while not (Open_List.empty()):
         MovesPath, Path = current_node.ReturnPath() #BackTrack to find path.
         for nodes in Path: #For Each node in ideal path
             PlotCurves(nodes.ReturnState(), nodes.ReturnMove(), WheelRadius, WheelDistance, 'm')
+
+            ##-------------YOU HAVE TO APPEND THE WHEEL COMMANDS TO A LIST AND SAVE AS A CSV FILE---------------##
 
 
     else: #If you have NOT reached the goal node
