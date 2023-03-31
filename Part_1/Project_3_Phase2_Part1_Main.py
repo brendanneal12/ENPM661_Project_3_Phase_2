@@ -230,7 +230,7 @@ def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, W
 
     if New_Node_Theta >= 360:
         New_Node_Theta = New_Node_Theta - 360
-    if New_Node_Theta < 0:
+    if New_Node_Theta < -360:
         New_Node_Theta = New_Node_Theta + 360
 
     return [New_Node_X, New_Node_Y, New_Node_Theta], MoveCost
@@ -377,7 +377,7 @@ plt.show()
 SizeArenaX = 600
 SizeArenaY = 200
 ThreshXY = 0.5
-ThreshTheta = 5
+ThreshTheta = 30
 ThreshGoalState = 3
 
 # Initialize Node Array
@@ -387,7 +387,8 @@ node_array = np.array([[[ 0 for k in range(int(360/ThreshTheta))]
 
 Open_List = PriorityQueue() #Initialize list using priority queue.
 traversed_nodes = [] #Traversed nodes is for visualization later.
-starting_node = Node(InitState, None, [0,0], 0, Calculate_C2G(InitState, GoalState)) #Generate starting node based on the initial state given above.
+starting_node_Temp = Node(InitState, None, [0,0], 0, Calculate_C2G(InitState, GoalState)) #Generate starting node based on the initial state given above.
+starting_node = Node(InitState, starting_node_Temp, [0,0], 0, Calculate_C2G(InitState, GoalState)) #Generate starting node based on the initial state given above.
 Open_List.put((starting_node.ReturnTotalCost(), starting_node)) #Add to Open List
 GoalReach = False #Initialze Goal Check Variable
 Closed_List= np.array([])#Initialize Closed List of nodes. Closed list is based on node states
@@ -396,7 +397,7 @@ print("A* Search Starting!!!!")
 
 while not (Open_List.empty()):
     current_node = Open_List.get()[1] #Grab first (lowest cost) item from Priority Queue.
-    PlotCurves(current_node.ReturnState(), current_node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance)
+    PlotCurves(current_node.ReturnParentState(), current_node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance)
 
     traversed_nodes.append(current_node) #Append the explored node (for visualization later)
     print(current_node.ReturnState(), current_node.ReturnTotalCost()) #Print to show search is working.
@@ -408,7 +409,7 @@ while not (Open_List.empty()):
         print("Total Cost:", current_node.ReturnTotalCost()) #Print Total Cost
         MovesPath, Path = current_node.ReturnPath() #BackTrack to find path.
         for nodes in Path: #For Each node in ideal path
-            PlotCurves(nodes.ReturnState(), nodes.ReturnMove(), WheelRadius, WheelDistance, 'm', RobotRadius, DesClearance)
+            PlotCurves(nodes.ReturnParentState(), nodes.ReturnMove(), WheelRadius, WheelDistance, 'm', RobotRadius, DesClearance)
 
             ##-------------YOU HAVE TO APPEND THE WHEEL COMMANDS TO A LIST AND SAVE AS A CSV FILE---------------##
 
@@ -452,14 +453,14 @@ plt.imshow(arena, origin = 'lower')
 for node in traversed_nodes: #Plots the search area
     curr_node_state = node.ReturnState()
     parent_node_state = node.ReturnParentState()
-    PlotCurves(node.ReturnState(), node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance)
+    PlotCurves(node.ReturnParentState(), node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance)
     plt.pause(0.000001)
     
 
 for node in Path: #Plots the ideal path
     curr_node_state = node.ReturnState()
     parent_node_state = node.ReturnParentState()
-    PlotCurves(node.ReturnState(), node.ReturnMove(), WheelRadius, WheelDistance, 'm', RobotRadius, DesClearance)
+    PlotCurves(node.ReturnParentState(), node.ReturnMove(), WheelRadius, WheelDistance, 'm', RobotRadius, DesClearance)
     plt.pause(0.0001)
 
 plt.show()
