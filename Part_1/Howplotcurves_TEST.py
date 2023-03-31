@@ -19,8 +19,8 @@ def plot_curve(Xi,Yi,Thetai,UL,UR):
 # Xn, Yn, Thetan: End point coordintes
     t = 0
     dt = 0.1
-    Curr_Node_X = Xi
-    Curr_Node_Y = Yi
+    Curr_Node_X = Xn
+    Curr_Node_Y = Yn
     Curr_Node_Theta = np.deg2rad(Thetai)
 
     New_Node_X = Curr_Node_X
@@ -31,12 +31,12 @@ def plot_curve(Xi,Yi,Thetai,UL,UR):
         t += dt
         X_Start = New_Node_X
         Y_Start = New_Node_Y
-        ChangeX = 0.5*WheelRad*(UL+UR)*np.cos(Curr_Node_Theta)*dt
-        ChangeY = 0.5*WheelRad*(UL+UR)*np.sin(Curr_Node_Theta)*dt
-        ChangeTheta = (WheelRad/WheelDist)*(UL-UR)*dt
-        New_Node_X += ChangeX
-        New_Node_Y += ChangeY
+        New_Node_X += 0.5*WheelRad*(UL+UR)*np.cos(New_Node_Theta)*dt
+        New_Node_Y += 0.5*WheelRad*(UL+UR)*np.sin(New_Node_Theta)*dt
+        New_Node_Theta += (WheelRad/WheelDist)*(UR-UL)*dt
         plt.plot([X_Start, New_Node_X], [Y_Start, New_Node_Y], color = 'g', linewidth = 0.75)
+
+
     return Xn, Yn, Thetan
     
 
