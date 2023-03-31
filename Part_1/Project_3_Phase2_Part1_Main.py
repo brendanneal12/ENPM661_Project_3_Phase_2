@@ -175,7 +175,7 @@ def checkValid(x, y, s, r):
     if checkClearance(x, y, s, r):
         return False
     
-    if (x < 0 or x >= 600 or y < 0 or y >= 250):
+    if (x < 0 or x >= 600 or y < 0 or y >= 200):
         return False
     
     return True
@@ -203,7 +203,7 @@ def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, W
     Curr_Node_X = CurrentNodeState[0]
     Curr_Node_Y = CurrentNodeState[1]
     Curr_Node_Theta = np.deg2rad(CurrentNodeState[2])
-    MoveCost = 0
+    MoveCost = 0.0
     New_Node_X = Curr_Node_X
     New_Node_Y = Curr_Node_Y
     New_Node_Theta = Curr_Node_Theta
@@ -218,17 +218,17 @@ def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, W
 
         MoveCost += np.sqrt((ChangeX)**2 + (ChangeY)**2)
 
-        if checkValid(New_Node_X, New_Node_Y, RobotRadius, ObsClearance) == False:
+        if checkValid(New_Node_X, New_Node_Y, ObsClearance, RobotRadius) == False:
             return None, None
         
-        New_Node_Theta = int(np.rad2deg(New_Node_Theta))
+    New_Node_Theta = int(np.rad2deg(New_Node_Theta))
 
-        if New_Node_Theta >= 360:
-            New_Node_Theta = New_Node_Theta - 360
-        if New_Node_Theta < 0:
-            New_Node_Theta = New_Node_Theta + 360
+    if New_Node_Theta >= 360:
+        New_Node_Theta = New_Node_Theta - 360
+    if New_Node_Theta < 0:
+        New_Node_Theta = New_Node_Theta + 360
 
-        return [New_Node_X, New_Node_Y, New_Node_Theta], MoveCost
+    return [New_Node_X, New_Node_Y, New_Node_Theta], MoveCost
     
 ##---------------------------Defining my Cost to Go Calculation---------------------------##
 def Calculate_C2G(CurrentNodeState, GoalNodeState):
@@ -290,18 +290,22 @@ def PlotCurves(CurrentNodeState, WheelAction, WheelRad, WheelDist, Color):
     Curr_Node_X = CurrentNodeState[0]
     Curr_Node_Y = CurrentNodeState[1]
     Curr_Node_Theta = np.deg2rad(CurrentNodeState[2])
+
     New_Node_X = Curr_Node_X
     New_Node_Y = Curr_Node_Y
     New_Node_Theta = Curr_Node_Theta
+
     while t < 1:
         t += dt
+        X_Start = New_Node_X
+        Y_Start = New_Node_Y
         ChangeX = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.cos(Curr_Node_Theta)*dt
         ChangeY = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.sin(Curr_Node_Theta)*dt
         ChangeTheta = (WheelRad/WheelDist)*(WheelAction[0]-WheelAction[1])*dt
         New_Node_X += ChangeX
         New_Node_Y += ChangeY
         New_Node_Theta += ChangeTheta
-        plt.plot([Curr_Node_X, New_Node_X], [Curr_Node_Y, New_Node_Y], color = Color)
+        plt.plot([X_Start, New_Node_X], [Y_Start, New_Node_Y], color = Color, linewidth = 0.75)
 
 
 
@@ -336,9 +340,9 @@ def GetWheelRPM():
 
 ##-------Getting Parameters from Burger TurtleBot Dimensions-------##
 
-WheelRadius = 3.3 #cm
-RobotRadius = 8.9 #cm
-WheelDistance = 16.0 #cm
+WheelRadius = 3.8 #cm
+RobotRadius = 17.8 #cm
+WheelDistance = 35.4 #cm
 
 ##----------------------Arena Setup-------------------##
 arena = np.zeros((200, 600, 3), dtype = "uint8")
@@ -354,7 +358,7 @@ if not checkValid(GoalState[0], GoalState[1], RobotRadius, DesClearance):
     print("Your goal state is inside an obstacle or outside the workspace. Please retry.")
     exit()
 
-#setup(RobotRadius, DesClearance)
+setup(RobotRadius, DesClearance)
 
 WSColoring(arena, InitState, (0,255,0))
 WSColoring(arena, GoalState, (0,255,0))
@@ -366,8 +370,8 @@ plt.show()
 SizeArenaX = 600
 SizeArenaY = 200
 ThreshXY = 0.5
-ThreshTheta = 30
-ThreshGoalState = 1.5
+ThreshTheta = 5
+ThreshGoalState = 3
 
 # Initialize Node Array
 node_array = np.array([[[ 0 for k in range(int(360/ThreshTheta))] 
@@ -397,7 +401,7 @@ while not (Open_List.empty()):
         print("Goal Reached!")
         print("Total Cost:", current_node.ReturnTotalCost()) #Print Total Cost
         MovesPath, Path = current_node.ReturnPath() #BackTrack to find path.
-        for nodes in Path: #For Each node in ideal path
+        for nodes in Path[1:]: #For Each node in ideal path
             PlotCurves(nodes.ReturnState(), nodes.ReturnMove(), WheelRadius, WheelDistance, 'm')
 
             ##-------------YOU HAVE TO APPEND THE WHEEL COMMANDS TO A LIST AND SAVE AS A CSV FILE---------------##
@@ -439,14 +443,14 @@ print("Visualization Starting!")
 plt.plot(InitState[0], InitState[1], 'go', markersize = 0.5) #plot init state
 plt.imshow(arena, origin = 'lower')
 
-for node in traversed_nodes: #Plots the search area
+for node in traversed_nodes[1:]: #Plots the search area
     curr_node_state = node.ReturnState()
     parent_node_state = node.ReturnParentState()
     PlotCurves(node.ReturnState(), node.ReturnMove(), WheelRadius, WheelDistance, 'g')
     plt.pause(0.000001)
     
 
-for node in Path: #Plots the ideal path
+for node in Path[1:]: #Plots the ideal path
     curr_node_state = node.ReturnState()
     parent_node_state = node.ReturnParentState()
     PlotCurves(node.ReturnState(), node.ReturnMove(), WheelRadius, WheelDistance, 'm')
