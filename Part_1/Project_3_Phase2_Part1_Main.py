@@ -62,10 +62,10 @@ class Node():
         return CompletedMoves, NodePath
     
 ##----------------------Defining Obstacle Space Setup Functions--------------------##
-def setup(robotradius, ObsClearance):
+def setup(s, r):
 
     global arena
-
+    
     #Colors
     white = (255, 255, 255)
     gray = (177, 177, 177)
@@ -74,136 +74,105 @@ def setup(robotradius, ObsClearance):
     #Draw Radial Clearance
     for x in range(0, 600):
 
-        for y in range(0, 250):
+        for y in range(0, 200):
         
-            if checkClearance(x, y, robotradius, ObsClearance):
+            if checkClearance(x, y, s, r):
                 arena[y, x] = darkGray
     
     #Draw Obstacle Borders
     for x in range(0, 600):
 
-        for y in range(0, 250):
+        for y in range(0, 200):
         
-            if checkBorder(x, y, ObsClearance):
+            if checkBorder(x, y, s):
                 arena[y, x] = gray
     
     #Draw Obstacles
     for x in range(0, 600):
 
-        for y in range(0, 250):
+        for y in range(0, 200):
         
             if checkObstacle(x, y):
                 arena[y, x] = white
                 
-##---------------------------Obstacle Setup Function------------------------##
+#Checks to see if a point is within an obstacle
 def checkObstacle(x, y):
     
-    #Both Rectangles
-    if x >= 100 and x <= 150:
+    #Left Rectangle
+    if x >= 150 and x < 165:
         
-        if y < 100 or y >= 150:
+        if y < 125 and y >= 0:
             return True
     
-    #Pentagon (Left Half)
-    if x >= 235 and x <= 300:
+    #Right Rectangle
+    if x >= 250 and x < 265:
         
-        if (y >= (-38/65)*x + (2930/13)) and (y <= (38/65)*x + (320/13)):
+        if y < 200 and y >= 75:
             return True
-    
-    #Pentagon (Right Half)
-    if x >= 300 and x <= 366:
         
-        if (y >= (38/65)*x + (-1630/13)) and (y <= (-38/65)*x + (4880/13)):
-            return True
-    
-    #Triangle
-    if x >= 460 and x <= 510:
-        
-        if (y >= 2*x - 895) and (y <= -2*x + 1145):
-            return True
+    #Circle
+    if (x - 400) * (x - 400) + (y - 90) * (y - 90) <= 50*50:
+        return True
         
     return False
   
-##-----------------------------Border Check Function---------------------##
-def checkBorder(x, y, ObsClearance):
+#Checks to see if a point is within the border of an obstacle
+def checkBorder(x, y, s):
     
-    triHeight = int(round(5/math.cos(math.radians(63.4))))
-    hexHeight = int(round(5/math.cos(math.radians(30.3))))
-    
-    #Both Rectangles
-    if x >= 100 - ObsClearance and x <= 150 + ObsClearance:
+    #Left Rectangle
+    if x >= 150 - s and x < 165 + s:
         
-        if y < 100 + ObsClearance or y >= 150 - ObsClearance:
+        if y < 125 + s and y >= 0:
             return True
     
-    #Pentagon (Left Half)
-    if x >= 235 - ObsClearance and x <= 300:
+    #Right Rectangle
+    if x >= 250 - s and x < 265 + s:
         
-        if (y >= (-38/65)*x + (2930/13) - hexHeight) and (y <= (38/65)*x + (320/13) + hexHeight):
+        if y < 200 + s and y >= 75 - s:
             return True
-    
-    #Pentagon (Right Half)
-    if x >= 300 and x <= 366 + ObsClearance:
         
-        if (y >= (38/65)*x + (-1630/13) - hexHeight) and (y <= (-38/65)*x + (4880/13) + hexHeight):
-            return True
-    
-    #Triangle
-    if x >= 460 - ObsClearance and x <= 510 + ObsClearance:
-        
-        if (y >= 2*x - 895 - triHeight) and (y <= -2*x + 1145 + triHeight) and (y >= 25 - ObsClearance) and (y <= 225 + ObsClearance):
-            return True
+    #Circle
+    if (x - 400) * (x - 400) + (y - 90) * (y - 90) <= (50 + s) * (50 + s):
+        return True
         
     return False
 
-##-------------------------------Defining Radial Clearance Function--------------##
-def checkClearance(x, y, r, ObsClearance):
+#Checks to see if a point is within radial clearance of a border
+def checkClearance(x, y, s, r):
     
-    rr = r+1
+    rr = r - 1
     
     if rr == 0:
         return False
     
-    triHeight = int(round((5 + rr)/math.cos(math.radians(63.4))))
-    hexHeight = int(round((5 + rr)/math.cos(math.radians(30.3))))
-    
-    #Both Rectangles
-    if x >= 100 - ObsClearance - rr and x <= 150 + ObsClearance + rr:
+    #Left Rectangle
+    if x >= 150 - s - rr and x < 165 + s + rr:
         
-        if y < 100 + ObsClearance + rr or y >= 150 - ObsClearance - rr:
+        if y < 125 + s + rr and y >= 0:
             return True
     
-    #Pentagon (Left Half)
-    if x >= 235 - ObsClearance - rr and x <= 300:
+    #Right Rectangle
+    if x >= 250 - s - rr and x < 265 + s + rr:
         
-        if (y >= (-38/65)*x + (2930/13) - hexHeight) and (y <= (38/65)*x + (320/13) + hexHeight):
+        if y < 200 + s + rr and y >= 75 - s - rr:
             return True
-    
-    #Pentagon (Right Half)
-    if x >= 300 and x <= 366 + 5 + rr:
         
-        if (y >= (38/65)*x + (-1630/13) - hexHeight) and (y <= (-38/65)*x + (4880/13) + hexHeight):
-            return True
-    
-    #Triangle
-    if x >= 460 - ObsClearance - rr and x <= 510 + ObsClearance + rr:
-        
-        if (y >= 2*x - 895 - triHeight) and (y <= -2*x + 1145 + triHeight) and (y >= 25 - ObsClearance - rr) and (y <= 225 + ObsClearance + rr):
-            return True
+    #Circle
+    if (x - 400) * (x - 400) + (y - 90) * (y - 90) <= (50 + s + rr) * (50 + s + rr):
+        return True
         
     return False
 
-##---------------------------------------Defining Check Valid Move Function-----------------------##
 #Checks to see if a point is valid (by checking obstacle, border, and clearance, as well as making sure the point is within arena bounds)
-def checkValid(x, y, r, ObsClearance):
+def checkValid(x, y, s, r):
     
     if checkObstacle(x, y):
         return False
     
-    if checkBorder(x, y, ObsClearance):
+    if checkBorder(x, y, s):
         return False
     
-    if checkClearance(x, y, r, ObsClearance):
+    if checkClearance(x, y, s, r):
         return False
     
     if (x < 0 or x >= 600 or y < 0 or y >= 250):
@@ -367,23 +336,23 @@ def GetWheelRPM():
 
 ##-------Getting Parameters from Burger TurtleBot Dimensions-------##
 
-WheelRadius = 33 #mm
-RobotRadius = 89 #mm
-WheelDistance = 160 #mm
+WheelRadius = 3.3 #cm
+RobotRadius = 8.9 #cm
+WheelDistance = 16.0 #cm
 
 ##----------------------Arena Setup-------------------##
-arena = np.zeros((250, 600, 3), dtype = "uint8")
+arena = np.zeros((200, 600, 3), dtype = "uint8")
 InitState = GetInitialState()
 GoalState =GetGoalState()
 DesClearance = GetClearance()
 WheelRPMS = GetWheelRPM()
 
-# if not checkValid(InitState[0], InitState[1], RobotRadius, DesClearance):
-#     print("Your initial state is inside an obstacle or outside the workspace. Please retry.")
-#     exit()
-# if not checkValid(GoalState[0], GoalState[1], RobotRadius, DesClearance):
-#     print("Your goal state is inside an obstacle or outside the workspace. Please retry.")
-#     exit()
+if not checkValid(InitState[0], InitState[1], RobotRadius, DesClearance):
+    print("Your initial state is inside an obstacle or outside the workspace. Please retry.")
+    exit()
+if not checkValid(GoalState[0], GoalState[1], RobotRadius, DesClearance):
+    print("Your goal state is inside an obstacle or outside the workspace. Please retry.")
+    exit()
 
 #setup(RobotRadius, DesClearance)
 
@@ -395,7 +364,7 @@ plt.show()
 
 #Initialize Arena and Thresholds
 SizeArenaX = 600
-SizeArenaY = 250
+SizeArenaY = 200
 ThreshXY = 0.5
 ThreshTheta = 30
 ThreshGoalState = 1.5
