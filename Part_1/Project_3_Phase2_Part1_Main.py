@@ -213,8 +213,8 @@ def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, W
 
     while t < 1:
         t += dt
-        ChangeX = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.cos(Curr_Node_Theta)*dt
-        ChangeY = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.sin(Curr_Node_Theta)*dt
+        ChangeX = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.cos(New_Node_Theta)*dt
+        ChangeY = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.sin(New_Node_Theta)*dt
         ChangeTheta = (WheelRad/WheelDist)*(WheelAction[0]-WheelAction[1])*dt
         
         New_Node_X += ChangeX
@@ -396,7 +396,6 @@ print("A* Search Starting!!!!")
 
 while not (Open_List.empty()):
     current_node = Open_List.get()[1] #Grab first (lowest cost) item from Priority Queue.
-    #if current_node.ReturnMove() is not None:
     PlotCurves(current_node.ReturnState(), current_node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance)
 
     traversed_nodes.append(current_node) #Append the explored node (for visualization later)
