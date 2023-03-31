@@ -51,7 +51,8 @@ class Node():
         CompletedMoves = [] #Initialize Move Array
         NodePath = [] #Initialize the Node Path
         CurrentNode = self
-        while(CurrentNode.ReturnMove() is not None): #For move that a Node has made
+        #while(CurrentNode.ReturnMove() is not None): #For move that a Node has made
+        while(CurrentNode.ReturnMove() != [0,0]):
             CompletedMoves.append(CurrentNode.ReturnMove()) #Append the previous move
             NodePath.append(CurrentNode) #Append Node to Path
             CurrentNode = CurrentNode.ReturnParent() #Backtrack to the Parent before repeating Process
@@ -203,23 +204,27 @@ def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, W
     Curr_Node_X = CurrentNodeState[0]
     Curr_Node_Y = CurrentNodeState[1]
     Curr_Node_Theta = np.deg2rad(CurrentNodeState[2])
+
     MoveCost = 0.0
+
     New_Node_X = Curr_Node_X
     New_Node_Y = Curr_Node_Y
     New_Node_Theta = Curr_Node_Theta
+
     while t < 1:
         t += dt
         ChangeX = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.cos(Curr_Node_Theta)*dt
         ChangeY = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.sin(Curr_Node_Theta)*dt
         ChangeTheta = (WheelRad/WheelDist)*(WheelAction[0]-WheelAction[1])*dt
+        
         New_Node_X += ChangeX
         New_Node_Y += ChangeY
         New_Node_Theta += ChangeTheta
 
         MoveCost += np.sqrt((ChangeX)**2 + (ChangeY)**2)
 
-        if checkValid(New_Node_X, New_Node_Y, ObsClearance, RobotRadius) == False:
-            return None, None
+    if checkValid(New_Node_X, New_Node_Y, ObsClearance, RobotRadius) == False:
+        return None, None
         
     New_Node_Theta = int(np.rad2deg(New_Node_Theta))
 
@@ -284,7 +289,7 @@ def WSColoring(Workspace, Location, Color):
     return Workspace  
 
 '''For Curves'''
-def PlotCurves(CurrentNodeState, WheelAction, WheelRad, WheelDist, Color):
+def PlotCurves(CurrentNodeState, WheelAction, WheelRad, WheelDist, Color, RobotRadius, ObsClearance):
     t = 0
     dt = 0.1
     Curr_Node_X = CurrentNodeState[0]
@@ -305,7 +310,8 @@ def PlotCurves(CurrentNodeState, WheelAction, WheelRad, WheelDist, Color):
         New_Node_X += ChangeX
         New_Node_Y += ChangeY
         New_Node_Theta += ChangeTheta
-        plt.plot([X_Start, New_Node_X], [Y_Start, New_Node_Y], color = Color, linewidth = 0.75)
+        if checkValid(New_Node_X, New_Node_Y, ObsClearance, RobotRadius) == True:
+            plt.plot([X_Start, New_Node_X], [Y_Start, New_Node_Y], color = Color, linewidth = 0.75)
 
 
 
@@ -380,7 +386,7 @@ node_array = np.array([[[ 0 for k in range(int(360/ThreshTheta))]
 
 Open_List = PriorityQueue() #Initialize list using priority queue.
 traversed_nodes = [] #Traversed nodes is for visualization later.
-starting_node = Node(InitState, None, None, 0, Calculate_C2G(InitState, GoalState)) #Generate starting node based on the initial state given above.
+starting_node = Node(InitState, None, [0,0], 0, Calculate_C2G(InitState, GoalState)) #Generate starting node based on the initial state given above.
 Open_List.put((starting_node.ReturnTotalCost(), starting_node)) #Add to Open List
 GoalReach = False #Initialze Goal Check Variable
 Closed_List= np.array([])#Initialize Closed List of nodes. Closed list is based on node states
@@ -390,7 +396,7 @@ print("A* Search Starting!!!!")
 while not (Open_List.empty()):
     current_node = Open_List.get()[1] #Grab first (lowest cost) item from Priority Queue.
     if current_node.ReturnMove() is not None:
-        PlotCurves(current_node.ReturnState(), current_node.ReturnMove(), WheelRadius, WheelDistance, 'g')
+        PlotCurves(current_node.ReturnState(), current_node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance)
 
     traversed_nodes.append(current_node) #Append the explored node (for visualization later)
     print(current_node.ReturnState(), current_node.ReturnTotalCost()) #Print to show search is working.
@@ -401,8 +407,8 @@ while not (Open_List.empty()):
         print("Goal Reached!")
         print("Total Cost:", current_node.ReturnTotalCost()) #Print Total Cost
         MovesPath, Path = current_node.ReturnPath() #BackTrack to find path.
-        for nodes in Path[1:]: #For Each node in ideal path
-            PlotCurves(nodes.ReturnState(), nodes.ReturnMove(), WheelRadius, WheelDistance, 'm')
+        for nodes in Path: #For Each node in ideal path
+            PlotCurves(nodes.ReturnState(), nodes.ReturnMove(), WheelRadius, WheelDistance, 'm', RobotRadius, DesClearance)
 
             ##-------------YOU HAVE TO APPEND THE WHEEL COMMANDS TO A LIST AND SAVE AS A CSV FILE---------------##
 
@@ -443,17 +449,17 @@ print("Visualization Starting!")
 plt.plot(InitState[0], InitState[1], 'go', markersize = 0.5) #plot init state
 plt.imshow(arena, origin = 'lower')
 
-for node in traversed_nodes[1:]: #Plots the search area
+for node in traversed_nodes: #Plots the search area
     curr_node_state = node.ReturnState()
     parent_node_state = node.ReturnParentState()
-    PlotCurves(node.ReturnState(), node.ReturnMove(), WheelRadius, WheelDistance, 'g')
+    PlotCurves(node.ReturnState(), node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance)
     plt.pause(0.000001)
     
 
-for node in Path[1:]: #Plots the ideal path
+for node in Path: #Plots the ideal path
     curr_node_state = node.ReturnState()
     parent_node_state = node.ReturnParentState()
-    PlotCurves(node.ReturnState(), node.ReturnMove(), WheelRadius, WheelDistance, 'm')
+    PlotCurves(node.ReturnState(), node.ReturnMove(), WheelRadius, WheelDistance, 'm', RobotRadius, DesClearance)
     plt.pause(0.0001)
 
 plt.show()

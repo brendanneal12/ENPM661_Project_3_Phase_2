@@ -31,14 +31,12 @@ def plot_curve(Xi,Yi,Thetai,UL,UR):
     return Xn, Yn, Thetan, D
     
 
-actions=[[5,5], [10,10],[5,0],[0,5],[5,10],[10,5], [10,0], [0,10]]
+actions=[[5,5], [10,10],[5,0],[0,5],[5,10],[10,5]]
         
 for action in actions:
    X1= plot_curve(0,0,45, action[0],action[1]) # (0,0,45) hypothetical start configuration
-   print(X1)
    for action in actions:
       X2=plot_curve(X1[0],X1[1],X1[2], action[0],action[1])
-      print(X2)
       
    
 
