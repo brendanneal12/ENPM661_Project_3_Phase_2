@@ -188,30 +188,31 @@ def checkValid(x, y, s, r):
 def ReturnPossibleStates(CurrentNodeState, Wheel_RPMS, RobotRadius, ObsClearance, WheelRad, WheelDist):
     RPM1 = Wheel_RPMS[0]
     RPM2 = Wheel_RPMS[1]
-    ActionSet = [[RPM1, RPM1], [RPM2,RPM2],[RPM1, RPM2], [RPM2, RPM1], [0,RPM1], [RPM1,0], [0,RPM2], [RPM2,0]]
-    NewNodeStates = []
+    ActionSet = [[RPM1, RPM1], [RPM2,RPM2],[RPM1, RPM2], [RPM2, RPM1], [0,RPM1], [RPM1,0], [0,RPM2], [RPM2,0]] #Differential Drive Action Set
+    NewNodeStates = [] #Init List of States
 
-    for action in ActionSet:
-        NewNodeState, Cost = CalcMoveWithCost(CurrentNodeState, action, RobotRadius, ObsClearance, WheelRad, WheelDist)
+    for action in ActionSet: #For each differential drive action
+        NewNodeState, Cost = CalcMoveWithCost(CurrentNodeState, action, RobotRadius, ObsClearance, WheelRad, WheelDist) #Calculate the state and cost
         if NewNodeState is not None:
-            NewNodeStates.append([NewNodeState, Cost, action])
+            NewNodeStates.append([NewNodeState, Cost, action]) #Append Chile Node States
     return NewNodeStates
 
-##---------------------------------Defining my Cost Function--------------------------------------##
+##---------------------------------Defining my Cost and NewNodeState Function--------------------------------------##
 
 def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, WheelRad, WheelDist):
-    t = 0
-    dt = 0.1
-    Curr_Node_X = CurrentNodeState[0]
-    Curr_Node_Y = CurrentNodeState[1]
-    Curr_Node_Theta = np.deg2rad(CurrentNodeState[2])
+    t = 0 
+    dt = 0.1 
+    Curr_Node_X = CurrentNodeState[0] #Grab Current Node X
+    Curr_Node_Y = CurrentNodeState[1] #Grad Current Node Y
+    Curr_Node_Theta = np.deg2rad(CurrentNodeState[2]) #Grab Current Node Theta, convert to radians.
 
-    MoveCost = 0.0
+    MoveCost = 0.0 #Init Cost
 
-    New_Node_X = Curr_Node_X
-    New_Node_Y = Curr_Node_Y
-    New_Node_Theta = Curr_Node_Theta
+    New_Node_X = Curr_Node_X #Set New Node Start Point X
+    New_Node_Y = Curr_Node_Y #Set New Node Start Point Y
+    New_Node_Theta = Curr_Node_Theta #Set New Node Start Point Theta
 
+    ##----------------Euler Integration to Generate Curvature----------------##
     while t < 1:
         t += dt
         ChangeX = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.cos(New_Node_Theta)*dt
@@ -224,11 +225,14 @@ def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, W
 
         MoveCost += np.sqrt((ChangeX)**2 + (ChangeY)**2)
 
+        ##-----------Why CheckValid is inside the loop---------------##
+        '''Inside the loop because if we only checked final, the intermediate steps would sometimes be in the obstacle space.'''
         if checkValid(New_Node_X, New_Node_Y, ObsClearance, RobotRadius) == False:
             return None, None
         
-    New_Node_Theta = int(np.rad2deg(New_Node_Theta))
+    New_Node_Theta = int(np.rad2deg(New_Node_Theta)) #Convert back to Degrees
 
+    ##-----Wrap to -360-360-----##
     if New_Node_Theta >= 360:
         New_Node_Theta = New_Node_Theta - 360
     if New_Node_Theta < -360:
@@ -290,12 +294,14 @@ def WSColoring(Workspace, Location, Color):
     return Workspace  
 
 '''For Curves'''
-def PlotCurves(CurrentNodeState, WheelAction, WheelRad, WheelDist, Color, RobotRadius, ObsClearance):
+#Relatively the same function as the cost and state function, but with modifications to just plot.
+#Plots Curve from Parent to New State
+def PlotCurves(ParentNodeState, WheelAction, WheelRad, WheelDist, Color, RobotRadius, ObsClearance):
     t = 0
     dt = 0.1
-    Curr_Node_X = CurrentNodeState[0]
-    Curr_Node_Y = CurrentNodeState[1]
-    Curr_Node_Theta = np.deg2rad(CurrentNodeState[2])
+    Curr_Node_X = ParentNodeState[0]
+    Curr_Node_Y = ParentNodeState[1]
+    Curr_Node_Theta = np.deg2rad(ParentNodeState[2])
 
     New_Node_X = Curr_Node_X
     New_Node_Y = Curr_Node_Y
@@ -360,19 +366,22 @@ GoalState =GetGoalState()
 DesClearance = GetClearance()
 WheelRPMS = GetWheelRPM()
 
+#-----Check Valid Initial State-------##
 if not checkValid(InitState[0], InitState[1], RobotRadius, DesClearance):
     print("Your initial state is inside an obstacle or outside the workspace. Please retry.")
     exit()
+
+##----Check Valid Goal State----------##
 if not checkValid(GoalState[0], GoalState[1], RobotRadius, DesClearance):
     print("Your goal state is inside an obstacle or outside the workspace. Please retry.")
     exit()
 
-setup(RobotRadius, DesClearance)
+setup(RobotRadius, DesClearance) #Arena Setup
 
-WSColoring(arena, InitState, (0,255,0))
-WSColoring(arena, GoalState, (0,255,0))
+WSColoring(arena, InitState, (0,255,0)) #Plot Initial State
+WSColoring(arena, GoalState, (0,255,0)) #Plot Goal State
 
-plt.imshow(arena, origin='lower')
+plt.imshow(arena, origin='lower') #Show Initial Arena Setup
 plt.show()
 
 #Initialize Arena and Thresholds
@@ -389,7 +398,7 @@ node_array = np.array([[[ 0 for k in range(int(360/ThreshTheta))]
 
 Open_List = PriorityQueue() #Initialize list using priority queue.
 traversed_nodes = [] #Traversed nodes is for visualization later.
-starting_node_Temp = Node(InitState, None, [0,0], 0, Calculate_C2G(InitState, GoalState)) #Generate starting node based on the initial state given above.
+starting_node_Temp = Node(InitState, None, [0,0], 0, Calculate_C2G(InitState, GoalState)) #Generate temp starting node based on the initial state given above.
 starting_node = Node(InitState, starting_node_Temp, [0,0], 0, Calculate_C2G(InitState, GoalState)) #Generate starting node based on the initial state given above.
 Open_List.put((starting_node.ReturnTotalCost(), starting_node)) #Add to Open List
 GoalReach = False #Initialze Goal Check Variable
@@ -399,7 +408,7 @@ print("A* Search Starting!!!!")
 
 while not (Open_List.empty()):
     current_node = Open_List.get()[1] #Grab first (lowest cost) item from Priority Queue.
-    PlotCurves(current_node.ReturnParentState(), current_node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance)
+    PlotCurves(current_node.ReturnParentState(), current_node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance) #Plot Explored States Green
 
     traversed_nodes.append(current_node) #Append the explored node (for visualization later)
     print(current_node.ReturnState(), current_node.ReturnTotalCost()) #Print to show search is working.
@@ -410,13 +419,13 @@ while not (Open_List.empty()):
         print("Goal Reached!")
         print("Total Cost:", current_node.ReturnTotalCost()) #Print Total Cost
 
-        #WheelCommandsFile = open('WheelCommands_NAME.csv', 'w')
-        #WheelCommandsWriter = csv.writer(WheelCommandsFile)
+        #WheelCommandsFile = open('WheelCommands_NAME.csv', 'w') #Initialze CSV File for ROS
+        #WheelCommandsWriter = csv.writer(WheelCommandsFile) #Initialize CSV Writer For ROS
 
         MovesPath, Path = current_node.ReturnPath() #BackTrack to find path.
         for nodes in Path: #For Each node in ideal path
             PlotCurves(nodes.ReturnParentState(), nodes.ReturnMove(), WheelRadius, WheelDistance, 'm', RobotRadius, DesClearance)
-            #WheelCommandsWriter.writerow(nodes.ReturnMove())
+            #WheelCommandsWriter.writerow(nodes.ReturnMove()) #Write Ideal Path to CVS file.
 
 
 
