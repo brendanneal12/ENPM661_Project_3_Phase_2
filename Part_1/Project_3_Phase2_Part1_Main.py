@@ -176,7 +176,7 @@ def checkValid(x, y, s, r):
     if checkClearance(x, y, s, r):
         return False
     
-    if (x < 0 or x >= 600 or y < 0 or y >= 200):
+    if (x < 0 or x >= 599 or y < 0 or y >= 199):
         return False
     
     return True
