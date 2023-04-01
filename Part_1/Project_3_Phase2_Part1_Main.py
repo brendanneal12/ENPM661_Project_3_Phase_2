@@ -223,8 +223,8 @@ def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, W
 
         MoveCost += np.sqrt((ChangeX)**2 + (ChangeY)**2)
 
-    if checkValid(New_Node_X, New_Node_Y, ObsClearance, RobotRadius) == False:
-        return None, None
+        if checkValid(New_Node_X, New_Node_Y, ObsClearance, RobotRadius) == False:
+            return None, None
         
     New_Node_Theta = int(np.rad2deg(New_Node_Theta))
 
@@ -454,7 +454,7 @@ for node in traversed_nodes: #Plots the search area
     curr_node_state = node.ReturnState()
     parent_node_state = node.ReturnParentState()
     PlotCurves(node.ReturnParentState(), node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance)
-    plt.pause(0.000001)
+    plt.pause(0.0000000001)
     
 
 for node in Path: #Plots the ideal path
