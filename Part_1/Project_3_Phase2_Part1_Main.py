@@ -9,6 +9,7 @@ import math
 import timeit
 import queue
 from queue import PriorityQueue
+import csv
 
 
 ##------------Defining Node Class (From Previous Project)-----------------##
@@ -352,6 +353,7 @@ RobotRadius = 17.8 #cm
 WheelDistance = 35.4 #cm
 
 ##----------------------Arena Setup-------------------##
+
 arena = np.zeros((200, 600, 3), dtype = "uint8")
 InitState = GetInitialState()
 GoalState =GetGoalState()
@@ -407,11 +409,16 @@ while not (Open_List.empty()):
     if goalreachcheck: #If we have reached goal node.
         print("Goal Reached!")
         print("Total Cost:", current_node.ReturnTotalCost()) #Print Total Cost
+
+        #WheelCommandsFile = open('WheelCommands_NAME.csv', 'w')
+        #WheelCommandsWriter = csv.writer(WheelCommandsFile)
+
         MovesPath, Path = current_node.ReturnPath() #BackTrack to find path.
         for nodes in Path: #For Each node in ideal path
             PlotCurves(nodes.ReturnParentState(), nodes.ReturnMove(), WheelRadius, WheelDistance, 'm', RobotRadius, DesClearance)
+            #WheelCommandsWriter.writerow(nodes.ReturnMove())
 
-            ##-------------YOU HAVE TO APPEND THE WHEEL COMMANDS TO A LIST AND SAVE AS A CSV FILE---------------##
+
 
 
     else: #If you have NOT reached the goal node
