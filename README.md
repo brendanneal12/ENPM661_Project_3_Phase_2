@@ -3,12 +3,12 @@ UMD ENPM661 Project 3 Phase 2.
 
 # Student Information
 Brendan Neal:
-Directory ID: bneal12
-UID: 119471128
+Directory ID: bneal12.
+UID: 119471128.
 
 Adam Lobo:
-Directory ID: alobo
-UID: 115806078
+Directory ID: alobo.
+UID: 115806078.
 
 # Project Information
 Goal: Solve a Maze using the A* Algorithm with Differential Drive Non-Holonomic Constraints
@@ -49,5 +49,5 @@ numpy, opencv, from matplotlib: pyplot, math, timeit, from queue: PriorityQueue,
 
 # How to Run Code: Part 2
 
-# Part 2 Important Nodes
+# Part 2 Important Notes
 
