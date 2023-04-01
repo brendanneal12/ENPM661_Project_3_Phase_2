@@ -7,8 +7,8 @@ Directory ID: bneal12
 UID: 119471128
 
 Adam Lobo:
-Directory ID:
-UID:
+Directory ID: alobo
+UID: 115806078
 
 # Project Information
 Goal: Solve a Maze using the A* Algorithm with Differential Drive Non-Holonomic Constraints
