@@ -33,7 +33,7 @@ Adam: https://github.com/AdazInventionz/ENPM661-Project-3-Part-2
 numpy, opencv, from matplotlib: pyplot, math, timeit, from queue: PriorityQueue, csv, rospy
 
 # How to Run Code: Part 1
-1. Hit Run
+1. Download a_star_adam_brendan_diffdrive.py, then cd to your your download location and type "python3 a_star_adam_brendan_diffdrive.py" to start the code.
 2. Prompted by the terminal, enter the initial state X, Y, and Theta with spaces separating them. Example: 50 100 0
 3. Prompted by the terminal, enter the initial state X and Y, with spaces separating them. Example: 500 100
 4. Prompted by the terminal, enter your desired clearance from obstacles. Example: 5
