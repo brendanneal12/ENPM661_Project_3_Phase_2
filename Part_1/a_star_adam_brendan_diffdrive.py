@@ -419,7 +419,7 @@ while not (Open_List.empty()):
         print("Goal Reached!")
         print("Total Cost:", current_node.ReturnTotalCost()) #Print Total Cost
 
-        #WheelCommandsFile = open('WheelCommands_NAME.csv', 'w') #Initialze CSV File for ROS
+        #WheelCommandsFile = open('WheelCommands_Crossmap.csv', 'w') #Initialze CSV File for ROS
         #WheelCommandsWriter = csv.writer(WheelCommandsFile) #Initialize CSV Writer For ROS
 
         MovesPath, Path = current_node.ReturnPath() #BackTrack to find path.
