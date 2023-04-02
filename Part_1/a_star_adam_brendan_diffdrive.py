@@ -103,17 +103,17 @@ def checkObstacle(x, y):
     #Left Rectangle
     if x >= 150 and x < 165:
         
-        if y < 125 and y >= 0:
+        if y < 200 and y >= 75:
             return True
     
     #Right Rectangle
     if x >= 250 and x < 265:
         
-        if y < 200 and y >= 75:
+        if y < 125 and y >= 0:
             return True
         
     #Circle
-    if (x - 400) * (x - 400) + (y - 90) * (y - 90) <= 50*50:
+    if (x - 400) * (x - 400) + (y - 110) * (y - 110) <= 50*50:
         return True
         
     return False
@@ -124,17 +124,17 @@ def checkBorder(x, y, s):
     #Left Rectangle
     if x >= 150 - s and x < 165 + s:
         
-        if y < 125 + s and y >= 0:
+        if y < 200 + s and y >= 75 - s:
             return True
     
     #Right Rectangle
     if x >= 250 - s and x < 265 + s:
         
-        if y < 200 + s and y >= 75 - s:
+        if y < 125 + s and y >= 0:
             return True
         
     #Circle
-    if (x - 400) * (x - 400) + (y - 90) * (y - 90) <= (50 + s) * (50 + s):
+    if (x - 400) * (x - 400) + (y - 110) * (y - 110) <= (50 + s) * (50 + s):
         return True
         
     return False
@@ -150,17 +150,17 @@ def checkClearance(x, y, s, r):
     #Left Rectangle
     if x >= 150 - s - rr and x < 165 + s + rr:
         
-        if y < 125 + s + rr and y >= 0:
+        if y < 200 + s + rr and y >= 75 - s - rr:
             return True
     
     #Right Rectangle
     if x >= 250 - s - rr and x < 265 + s + rr:
         
-        if y < 200 + s + rr and y >= 75 - s - rr:
+        if y < 125 + s + rr and y >= 0:
             return True
         
     #Circle
-    if (x - 400) * (x - 400) + (y - 90) * (y - 90) <= (50 + s + rr) * (50 + s + rr):
+    if (x - 400) * (x - 400) + (y - 110) * (y - 110) <= (50 + s + rr) * (50 + s + rr):
         return True
         
     return False
