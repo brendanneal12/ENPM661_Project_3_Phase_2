@@ -408,7 +408,7 @@ print("A* Search Starting!!!!")
 
 while not (Open_List.empty()):
     current_node = Open_List.get()[1] #Grab first (lowest cost) item from Priority Queue.
-    PlotCurves(current_node.ReturnParentState(), current_node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance) #Plot Explored States Green
+    #PlotCurves(current_node.ReturnParentState(), current_node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance) #Plot Explored States Green
 
     traversed_nodes.append(current_node) #Append the explored node (for visualization later)
     print(current_node.ReturnState(), current_node.ReturnTotalCost()) #Print to show search is working.
