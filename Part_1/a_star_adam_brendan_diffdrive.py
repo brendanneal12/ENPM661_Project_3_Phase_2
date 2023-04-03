@@ -218,6 +218,10 @@ def CalcMoveWithCost(CurrentNodeState, WheelAction, RobotRadius, ObsClearance, W
         ChangeX = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.cos(New_Node_Theta)*dt
         ChangeY = 0.5*WheelRad*(WheelAction[0]+WheelAction[1])*np.sin(New_Node_Theta)*dt
         ChangeTheta = (WheelRad/WheelDist)*(WheelAction[0]-WheelAction[1])*dt
+
+        # ChangeX/dt
+        # Ydot = ChangeY/dt
+        # Thetadot = ChangeTheta/dt
         
         New_Node_X += ChangeX
         New_Node_Y += ChangeY
