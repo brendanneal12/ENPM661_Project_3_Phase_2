@@ -49,9 +49,9 @@ numpy, opencv, from matplotlib: pyplot, math, timeit, from queue: PriorityQueue,
 
 # Part 1 Important Notes
 1. For the 2-D visualization, we defined everything in CENTIMETERS to better visualize on our screen.
-2. For cases far away from the start point, the search can take upward of 3-5 minutes. We are not generating repeat nodes. This long search time is due to us using OOP and the process is computationally expensive. Please be patient.
+2. For cases far away from the start point, the search can take upward of 1-2 minutes. We are not generating repeat nodes. This long search time is due to us using OOP and the process is computationally expensive. Please be patient.
 3. The visualization is also quite slow. Please be patient.
-4. Please click the following link in order to view an example output video. Initial State is 50 100 0. Goal State is 500 100. Desired Clearance is 5 and the wheel RPMS are 12 10. I cannot commit the video directly to GitHub since the file size is too large: https://drive.google.com/drive/u/0/folders/1An1wukgfk4Zb2PrgWcUQ8Ll5RnvF3wBx
+4. Please click the following link in order to view an example output video. Initial State is 50 100 0. Goal State is 550 100. Desired Clearance is 5 and the wheel RPMS are 12 10. I cannot commit the video directly to GitHub since the file size is too large: https://drive.google.com/drive/u/0/folders/1An1wukgfk4Zb2PrgWcUQ8Ll5RnvF3wBx
 
 # How to Run Code: Part 2
 
