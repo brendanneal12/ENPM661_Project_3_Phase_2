@@ -43,33 +43,32 @@ numpy, opencv, from matplotlib: pyplot, math, timeit, from queue: PriorityQueue,
 8. Close the window to begin the A* search.
 9. While the search is running, the currend node state (popped from the open list) is printed to the terminal.
 10. Once the goal is reached, the total cost and time to complete search will be printed to the terminal. The final map will be displayed to the screen with the optimal path in magenta.
-11. Additionally, a .csv file will appear in your workspace. This was used for debugging.
-12. Close the window to start the visualization.
-13. Once the visualization is complete, close the window to end the program.
+11. Close the window to start the visualization.
+12. Once the visualization is complete, close the window to end the program.
 
 # Part 1 Important Notes
-1. For the 2-D visualization, we defined everything in CENTIMETERS to better visualize on our screen.
-2. For cases far away from the start point, the search can take upward of 1-2 minutes. We are not generating repeat nodes. This long search time is due to us using OOP and the process is computationally expensive. Please be patient.
+1. For the 2-D visualization, we defined everything in centimeters to better visualize on our screen.
+2. For cases far away from the start point, the search can take upward of 1-3 minutes. We are not generating repeat nodes. This long search time is due to us using OOP and the process is computationally expensive. Please be patient.
 3. The visualization is also quite slow. Please be patient.
-4. Please click the following link in order to view an example output video. Initial State is 50 100 0. Goal State is 550 100. Desired Clearance is 5 and the wheel RPMS are 12 10. I cannot commit the video directly to GitHub since the file size is too large: https://drive.google.com/drive/u/0/folders/1An1wukgfk4Zb2PrgWcUQ8Ll5RnvF3wBx
+4. Please click the following link in order to view an example output video. Initial State is 50 100 0. Goal State is 550 100. Desired Clearance is 5 and the wheel RPMS are 12 10. I cannot commit the video directly to GitHub since the file size is too large: 
 
 # How to Run Code: Part 2
 1. Download the part_2 package to your associated catkin workspace and ensure that you have all the proper turtlebot3 dependencies installed.
 2. cd into your catkin workspace and perform catkin_make
 3. source devel/setup.bash
-4. roslaunch part_2 environment.launch x_init:=CHOOSE y_init:=CHOOSE theta_init:=CHOOSE x_final:=CHOOSE y_final:=CHOOSE RPM1:=CHOOSE RPM2:=CHOOSE
+4. roslaunch part_2 environment.launch x_init:=CHOOSE y_init:=CHOOSE theta_init:=CHOOSE x_final:=CHOOSE y_final:=CHOOSE clearance:=CHOOSE RPM1:=CHOOSE RPM2:=CHOOSE
 
 EXAMPLE for Cross-Map Exploration: 
 
-roslaunch part_2 environment.launch x_init:=0 y_init:=0 theta_init:=0 x_final:=5 y_final:=0 RPM1:=12 RPM2:=10
+roslaunch part_2 environment.launch x_init:=0 y_init:=0 theta_init:=0 x_final:=5 y_final:=0 clearance:=0.1 RPM1:=12 RPM2:=10
 
-5. Now, the process to set up the search algorithm is the same as part 1, except that you are not prompted to enter the initial state by the terminal due to blockage from the launch file prints.
-6. Click into the terminal and enter the initial state X, Y, and Theta with spaces separating them. Example: 0.5 0 0
-7. Prompted by the terminal, enter the goal state X and Y, with spaces separating them. Example: 5 0
-8. Prompted by the terminal, enter your desired clearance from obstacles (meters). Example: 0.05
-9. Prompted by the terminal, enter 2 unique wheel RPMS, separated by spaces. Example: 12 10
-10. If your initial or goal state is inside an obstacle or outside of the workspace, you will be prompted to restart.
-11. While the search is running, the currend node state (popped from the open list) is printed to the terminal.
+5. Like Phase 2 Part 1, while the search occurs, the popped node state will be printed to the terminal.
+6. When the search completes, the total cost and time to complete search will be printed to the terminal.
+7. Additionally, the terminal will tell you to observe the Gazebo map, so please direct your attention there to watch the 3-D visualization.
+8. Once the robot reaches the final destination, it will then crash into a wall and then restart the search. Please spam Ctrl C to end the program.
 
 # Part 2 Important Notes
+1. As mentioned in the project description, the robot will not follow the desired waypoints exactly, which is why toward the end the robot will overshoot the goal hit a wall before stopping.
+2. For cases far away from the start point, the search can take upward of 1-3 minutes. We are not generating repeat nodes. This long search time is due to us using OOP and the process is computationally expensive. Please be patient.
+3. Please click the following link in order to view an example output video. Initial State is 0 0 0. Goal State is 5 0. Desired Clearance is 0.1 and the wheel RPMS are 12 10. I cannot commit the video directly to GitHub since the file size is too large: 
 
