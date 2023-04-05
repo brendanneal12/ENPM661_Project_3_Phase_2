@@ -177,7 +177,7 @@ def checkValid(x, y, s, r):
     if checkClearance(x, y, s, r):
         return False
     
-    if (x < 0 or x >= 599 or y < 0 or y >= 199):
+    if (x < 0 + s + r or x >= 600 - s - r or y < 0 + s + r or y >= 200 -s - r): #Accounting for Robot size and Clearance on Borders.
         return False
     
     return True
@@ -423,15 +423,11 @@ while not (Open_List.empty()):
         print("Goal Reached!")
         print("Total Cost:", current_node.ReturnTotalCost()) #Print Total Cost
 
-        WheelCommandsFile = open('WheelCommands_Test.csv', 'w') #Initialze CSV File for ROS
-        WheelCommandsWriter = csv.writer(WheelCommandsFile) #Initialize CSV Writer For ROS
 
         MovesPath, Path = current_node.ReturnPath() #BackTrack to find path.
         for nodes in Path: #For Each node in ideal path
             PlotCurves(nodes.ReturnParentState(), nodes.ReturnMove(), WheelRadius, WheelDistance, 'm', RobotRadius, DesClearance)
-            row = nodes.ReturnMove()
-            WheelCommandsWriter.writerow(row) #Write Ideal Path to CVS file.
-        WheelCommandsFile.close()
+
 
 
 
