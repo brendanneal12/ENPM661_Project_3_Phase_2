@@ -471,7 +471,7 @@ for node in traversed_nodes: #Plots the search area
     curr_node_state = node.ReturnState()
     parent_node_state = node.ReturnParentState()
     PlotCurves(node.ReturnParentState(), node.ReturnMove(), WheelRadius, WheelDistance, 'g', RobotRadius, DesClearance)
-    plt.pause(0.0000000001)
+    plt.pause(0.0000000000000001)
     
 
 for node in Path: #Plots the ideal path
