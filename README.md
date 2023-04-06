@@ -50,7 +50,7 @@ numpy, opencv, from matplotlib: pyplot, math, timeit, from queue: PriorityQueue,
 1. For the 2-D visualization, we defined everything in centimeters to better visualize on our screen.
 2. For cases far away from the start point, the search can take upward of 1-3 minutes. We are not generating repeat nodes. This long search time is due to us using OOP and the process is computationally expensive. Please be patient.
 3. The visualization is EXTREMELY slow sometimes. Please be patient.
-4. Please click the following link in order to view an example output video. Initial State is 100 25 0. Goal State is 275 175. Desired Clearance is 5 and the wheel RPMS are 12 10. I cannot commit the video directly to GitHub since the file size is too large:
+4. Please click the following link in order to view an example output video. Initial State is 100 25 0. Goal State is 275 175. Desired Clearance is 5 and the wheel RPMS are 12 10. I cannot commit the video directly to GitHub since the file size is too large: https://drive.google.com/drive/u/0/folders/1sB2ZD-RLxDUYvLE9E8-aXxTPEskn2TtB
 
 
 # How to Run Code: Part 2
@@ -71,5 +71,5 @@ roslaunch part_2 environment.launch x_init:=0 y_init:=0 theta_init:=0 x_final:=5
 # Part 2 Important Notes
 1. As mentioned in the project description, the robot will not follow the desired waypoints exactly, which is why toward the end the robot will overshoot the goal hit a wall before stopping.
 2. For cases far away from the start point, the search can take upward of 1-3 minutes. We are not generating repeat nodes. This long search time is due to us using OOP and the process is computationally expensive. Please be patient.
-3. Please click the following link in order to view an example output video. Initial State is 0 0 0. Goal State is 5 0. Desired Clearance is 0.1 and the wheel RPMS are 12 10. I cannot commit the video directly to GitHub since the file size is too large: 
+3. Please click the following link in order to view an example output video. Initial State is 0 0 0. Goal State is 5 0. Desired Clearance is 0.1 and the wheel RPMS are 12 10. I cannot commit the video directly to GitHub since the file size is too large: https://drive.google.com/drive/u/0/folders/19TElCUhg1ncQpLBW3_Aya4z4HR7z4vDt
 
