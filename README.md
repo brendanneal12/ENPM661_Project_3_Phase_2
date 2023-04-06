@@ -33,7 +33,7 @@ Adam: https://github.com/AdazInventionz/ENPM661-Project-3-Part-2
 numpy, opencv, from matplotlib: pyplot, math, timeit, from queue: PriorityQueue, rospy, from geometry_msgs.msg: Twist, sys
 
 # How to Run Code: Part 1
-1. Download a_star_adam_brendan_diffdrive.py, then cd to your your download location and type "python3 a_star_adam_brendan_diffdrive.py" to start the code.
+1. Download a_star_adam_brendan_diffdrive.py then cd to your your download location and type "python3 a_star_adam_brendan_diffdrive.py" to start the code.
 2. Prompted by the terminal, enter the initial state X, Y, and Theta with spaces separating them. Example: 50 100 0
 3. Prompted by the terminal, enter the goal state X and Y, with spaces separating them. Example: 500 100
 4. Prompted by the terminal, enter your desired clearance from obstacles. Example: 5
@@ -69,7 +69,7 @@ roslaunch part_2 environment.launch x_init:=0 y_init:=0 theta_init:=0 x_final:=5
 8. Once the robot reaches the final destination, it will then crash into a wall and then restart the search. Please spam Ctrl C to end the program.
 
 # Part 2 Important Notes
-1. As mentioned in the project description, the robot will not follow the desired waypoints exactly, which is why toward the end the robot will overshoot the goal hit a wall before stopping.
+1. As mentioned in the project description, the robot will not follow the desired waypoints exactly, which is why toward the end the robot will overshoot the goal and hit a wall before stopping.
 2. For cases far away from the start point, the search can take upward of 1-3 minutes. We are not generating repeat nodes. This long search time is due to us using OOP and the process is computationally expensive. Please be patient.
 3. Please click the following link in order to view an example output video. Initial State is 0 0 0. Goal State is 5 0. Desired Clearance is 0.1 and the wheel RPMS are 12 10. I cannot commit the video directly to GitHub since the file size is too large: https://drive.google.com/drive/u/0/folders/19TElCUhg1ncQpLBW3_Aya4z4HR7z4vDt
 
