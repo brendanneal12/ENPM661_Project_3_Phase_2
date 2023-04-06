@@ -30,7 +30,7 @@ Brendan: https://github.com/brendanneal12/ENPM661_Project_3_Phase_2
 Adam: https://github.com/AdazInventionz/ENPM661-Project-3-Part-2
 
 # Libraries Used
-numpy, opencv, from matplotlib: pyplot, math, timeit, from queue: PriorityQueue, csv, rospy
+numpy, opencv, from matplotlib: pyplot, math, timeit, from queue: PriorityQueue, rospy, from geometry_msgs.msg: Twist, sys
 
 # How to Run Code: Part 1
 1. Download a_star_adam_brendan_diffdrive.py, then cd to your your download location and type "python3 a_star_adam_brendan_diffdrive.py" to start the code.
